@@ -1,22 +1,25 @@
 #ifndef DATALOADER_H
 #define DATALOADER_H
 
-#include <TFile.h>
-#include <TTree.h>
+#include <TString.h>
 #include <TMatrixD.h>
 #include <TVectorD.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <vector>
+
 class DataLoader {
 public:
-    DataLoader(const TString& filename);
+    DataLoader(const TString& inputFile);
     void ApplyPreFilters();
     TMatrixD GetFeatureMatrix();
     TVectorD GetLabels();
-private:
-    TFile* inputFile;
-    TTree* inputTree;
-    TMatrixD features;
-    TVectorD labels;
-    std::vector<TString> selectedVariables;
 
+private:
+    TString inputFile;
+    TFile* file;
+    TTree* tree;
+    std::vector<TString> selectedVariables;
 };
-#endif //DATALOADER_H
+
+#endif // DATALOADER_H
