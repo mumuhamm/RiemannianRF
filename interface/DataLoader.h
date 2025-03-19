@@ -1,3 +1,12 @@
+/*    Purpose: Load and preprocess data for training and evaluation.
+    Responsibilities:
+        Load features, labels, and curvature maps from input files.
+        Split data into training, validation, and test sets.
+        Normalize or preprocess data as needed.
+    Dependencies:
+        None (data loading and preprocessing).      
+*/
+
 #ifndef DATALOADER_H
 #define DATALOADER_H
 

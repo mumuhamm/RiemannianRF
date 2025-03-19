@@ -1,3 +1,11 @@
+/*    Purpose: Handle Riemannian geometry computations.
+    Responsibilities:
+        Compute Riemannian metrics (e.g., geodesic distances, curvature tensors).
+        Provide low-level geometry utilities for CurvatureRegularizer.
+    Dependencies:
+        None (standalone geometry computations).
+*/
+
 #ifndef MANIFOLDGEOMETRY_H
 #define MANIFOLDGEOMETRY_H
 #include <TMatrixD.h>

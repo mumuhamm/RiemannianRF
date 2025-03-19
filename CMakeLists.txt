@@ -42,9 +42,9 @@ install(TARGETS BDT_Riemannian DESTINATION bin)
 
 # Enable unit tests with Catch2 (optional)
 enable_testing()
-add_executable(UnitTests test/test_DataLoader.cc test/test_ManifoldGeometry.cc test/test_BDTTrainer.cc)
+add_executable(UnitTests test/test_DataLoader.cc test/test_ManifoldGeometry.cc test/test_ModelTrainer.cc)
 target_link_libraries(UnitTests ${ROOT_LIBRARIES})
 # Link Catch2
 target_link_libraries(UnitTests Catch2::Catch2WithMain)
-add_test(NAME BDTTests COMMAND UnitTests)
+add_test(NAME ModelTests COMMAND UnitTests)
 

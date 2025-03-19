@@ -1,12 +1,12 @@
-#include "BDTTrainer.h"
+#include "ModelTrainer.h"
 #include <iostream>
 
-BDTTrainer::BDTTrainer(bool useGPU) : useGPU(useGPU), useGBDT(false), useDNN(false), useRF(false) {
+ModelTrainer::ModelTrainer(bool useGPU) : useGPU(useGPU), useGBDT(false), useDNN(false), useRF(false) {
     factory = new TMVA::Factory("TMVAClassification", nullptr, "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification");
     dataloader = new TMVA::DataLoader("dataset");
 }
 
-void BDTTrainer::InitializeTMVA() {
+void ModelTrainer::InitializeTMVA() {
     if (useGBDT) {
         factory->BookMethod(dataloader, TMVA::Types::kBDT, "BDTG",
                             "!H:!V:NTrees=850:MinNodeSize=2.5%:MaxDepth=3:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:UseRandomisedTrees=True:UseNVars=10" + std::string(useGPU ? ":UseGPU=True" : ""));
@@ -21,7 +21,7 @@ void BDTTrainer::InitializeTMVA() {
     }
 }
 
-void BDTTrainer::TrainModels(const TMatrixD& features, const TVectorD& labels, const TMatrixD& curvatureMap) {
+void ModelTrainer::TrainModels(const TMatrixD& features, const TVectorD& labels, const TMatrixD& curvatureMap) {
     StartTimer();
 
     // Apply curvature regularization
@@ -45,7 +45,7 @@ void BDTTrainer::TrainModels(const TMatrixD& features, const TVectorD& labels, c
     PrintElapsedTime();
 }
 
-void BDTTrainer::TrainKFold(const TMatrixD& features, const TVectorD& labels, const TMatrixD& curvatureMap, int k) {
+void ModelTrainer::TrainKFold(const TMatrixD& features, const TVectorD& labels, const TMatrixD& curvatureMap, int k) {
     int nEntries = features.GetNrows();
     int foldSize = nEntries / k;
 
@@ -93,25 +93,25 @@ void BDTTrainer::TrainKFold(const TMatrixD& features, const TVectorD& labels, co
     }
 }
 
-void BDTTrainer::SaveModel(const TString& modelName) {
+void ModelTrainer::SaveModel(const TString& modelName) {
     factory->Save(modelName);
 }
 
-void BDTTrainer::SetModelFlags(bool useGBDT, bool useDNN, bool useRF) {
+void ModelTrainer::SetModelFlags(bool useGBDT, bool useDNN, bool useRF) {
     this->useGBDT = useGBDT;
     this->useDNN = useDNN;
     this->useRF = useRF;
 }
 
-void BDTTrainer::StartTimer() {
+void ModelTrainer::StartTimer() {
     startTime = std::chrono::high_resolution_clock::now();
 }
 
-void BDTTrainer::StopTimer() {
+void ModelTrainer::StopTimer() {
     endTime = std::chrono::high_resolution_clock::now();
 }
 
-void BDTTrainer::PrintElapsedTime() {
+void ModelTrainer::PrintElapsedTime() {
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
     std::cout << "Elapsed time: " << duration << " ms" << std::endl;
 }

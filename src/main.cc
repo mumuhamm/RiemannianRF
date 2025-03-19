@@ -1,13 +1,14 @@
 #include <iostream>
 #include "DataLoader.h"
 #include "ManifoldGeometry.h"
-#include "BDTTrainer.h"
+#include "ModelTrainer.h"
 #include "ConcurrencyManager.h"
 #include "Evaluation.h"
+#include "Config.h"
 
-void RunTraining(const std::vector<TString>& inputFiles, const TString& signalFile) {
+void RunTraining() {
     // Load ROOT Data
-    DataLoader signalLoader(signalFile);
+    DataLoader signalLoader(Config::SIGNAL_FILE);
     signalLoader.ApplyPreFilters();
     TMatrixD signalFeatures = signalLoader.GetFeatureMatrix();
     TVectorD signalLabels = signalLoader.GetLabels();
@@ -15,8 +16,8 @@ void RunTraining(const std::vector<TString>& inputFiles, const TString& signalFi
     TMatrixD backgroundFeatures;
     TVectorD backgroundLabels;
 
-    for (const auto& inputFile : inputFiles) {
-        if (inputFile != signalFile) {
+    for (const auto& inputFile : Config::INPUT_FILES) {
+        if (inputFile != Config::SIGNAL_FILE) {
             DataLoader backgroundLoader(inputFile);
             backgroundLoader.ApplyPreFilters();
             TMatrixD features = backgroundLoader.GetFeatureMatrix();
@@ -58,13 +59,13 @@ void RunTraining(const std::vector<TString>& inputFiles, const TString& signalFi
     TMatrixD curvatureMap = geom.ComputeCurvatureMap();
 
     // Train models with GPU Support
-    BDTTrainer trainer(true);  // Enable GPU
-    trainer.SetModelFlags(true, true, true);  // Enable GBDT, DNN, and RF
+    ModelTrainer trainer(Config::USE_GPU);  // Enable GPU
+    trainer.SetModelFlags(Config::USE_GBDT, Config::USE_DNN, Config::USE_RF);  // Enable GBDT, DNN, and RF
     trainer.InitializeTMVA();
-    trainer.TrainKFold(features, labels, curvatureMap, 5);  // Perform 5-fold cross-validation
+    trainer.TrainKFold(features, labels, curvatureMap, Config::K_FOLDS);  // Perform k-fold cross-validation
 
     // Save the models
-    trainer.SaveModel("TrainedModels");
+    trainer.SaveModel(Config::OUTPUT_MODEL_PATH);
 
     // Evaluate & Plot
     Evaluation eval;
@@ -73,15 +74,6 @@ void RunTraining(const std::vector<TString>& inputFiles, const TString& signalFi
 }
 
 int main() {
-    std::vector<TString> inputFiles = {
-        "/Users/am/Documents/06.Tracking/4mu/GluGluHToZZTo4L.root",
-        "/Users/am/Documents/06.Tracking/4mu/VBF_HToZZTo4L.root",
-        "/Users/am/Documents/06.Tracking/4mu/WH_HToZZTo4L.root",
-        "/Users/am/Documents/06.Tracking/4mu/ZZTo4L.root",
-        "/Users/am/Documents/06.Tracking/4mu/ttH_HToZZ_4L.root"
-    };
-    TString signalFile = "/Users/am/Documents/06.Tracking/4mu/WH_HToZZTo4L.root";
-
-    RunTraining(inputFiles, signalFile);
+    RunTraining();
     return 0;
 }

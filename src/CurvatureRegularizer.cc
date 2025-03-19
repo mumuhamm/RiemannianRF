@@ -16,9 +16,8 @@ TMatrixD CurvatureRegularizer::ProjectOntoStiefelManifold(const TMatrixD& data) 
     TDecompSVD svd(data);
     TMatrixD U = svd.GetU();
     TMatrixD V = svd.GetV();
-    TMatrixD S = svd.GetSig();
 
-    TMatrixD stiefel = U * S * V.T();
+    TMatrixD stiefel = U * V.T();
     return stiefel;
 }
 
